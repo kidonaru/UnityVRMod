@@ -7,8 +7,13 @@ namespace UnityVRMod.Core
 {
     public static class VRModKeybind
     {
+        /// <summary>companion (BG2VR) がキーバインドを管理する場合 true。fork 側の処理をスキップする。</summary>
+        public static bool ExternallyManaged;
+
         public static void Update()
         {
+            if (ExternallyManaged) return;
+
             if (ConfigManager.ToggleSafeModeKey != null && InputManager.GetKeyDown(ConfigManager.ToggleSafeModeKey.Value))
             {
                 VRModCore.LogRuntimeDebug("Toggle Safe Mode key pressed!");

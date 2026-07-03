@@ -90,6 +90,7 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
         XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED = 18,
         XR_TYPE_FRAME_WAIT_INFO = 33,
         XR_TYPE_COMPOSITION_LAYER_PROJECTION = 35,
+        XR_TYPE_COMPOSITION_LAYER_QUAD = 36,
         XR_TYPE_REFERENCE_SPACE_CREATE_INFO = 37,
         XR_TYPE_FRAME_STATE = 44,
         XR_TYPE_FRAME_BEGIN_INFO = 46,
@@ -98,9 +99,27 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
         XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO = 56,
         XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO = 57,
         XR_TYPE_VIEW_CONFIGURATION_VIEW = 41,
+        XR_TYPE_ACTION_STATE_BOOLEAN = 23,
+        XR_TYPE_ACTION_STATE_FLOAT = 24,
+        XR_TYPE_ACTION_STATE_VECTOR2F = 25,
+        XR_TYPE_ACTION_STATE_POSE = 27,
+        XR_TYPE_ACTION_SET_CREATE_INFO = 28,
+        XR_TYPE_ACTION_CREATE_INFO = 29,
+        XR_TYPE_ACTION_SPACE_CREATE_INFO = 38,
+        XR_TYPE_SPACE_LOCATION = 42,
+        XR_TYPE_SPACE_VELOCITY = 43,
+        XR_TYPE_HAPTIC_VIBRATION = 13,
+        XR_TYPE_HAPTIC_ACTION_INFO = 59,
+        XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING = 51,
+        XR_TYPE_ACTION_STATE_GET_INFO = 58,
+        XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO = 60,
+        XR_TYPE_ACTIONS_SYNC_INFO = 61,
         XR_TYPE_GRAPHICS_BINDING_D3D11_KHR = 1000027000,
         XR_TYPE_SWAPCHAIN_IMAGE_D3D11_KHR = 1000027001,
         XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR = 1000027002,
+        XR_TYPE_GRAPHICS_BINDING_D3D12_KHR = 1000028000,
+        XR_TYPE_SWAPCHAIN_IMAGE_D3D12_KHR = 1000028001,
+        XR_TYPE_GRAPHICS_REQUIREMENTS_D3D12_KHR = 1000028002,
     }
 
     public enum XrFormFactor { XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY = 1 }
@@ -110,9 +129,25 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
     public enum XrSessionState { XR_SESSION_STATE_UNKNOWN = 0, XR_SESSION_STATE_IDLE = 1, XR_SESSION_STATE_READY = 2, XR_SESSION_STATE_SYNCHRONIZED = 3, XR_SESSION_STATE_VISIBLE = 4, XR_SESSION_STATE_FOCUSED = 5, XR_SESSION_STATE_STOPPING = 6, XR_SESSION_STATE_LOSS_PENDING = 7, XR_SESSION_STATE_EXITING = 8 }
     public enum XrReferenceSpaceType { XR_REFERENCE_SPACE_TYPE_VIEW = 1, XR_REFERENCE_SPACE_TYPE_LOCAL = 2, XR_REFERENCE_SPACE_TYPE_STAGE = 3 }
     [Flags] public enum XrSwapchainCreateFlags : ulong { None = 0 }
-    [Flags] public enum XrSwapchainUsageFlags : ulong { XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT = 1, XR_SWAPCHAIN_USAGE_SAMPLED_BIT = 32 }
+    [Flags] public enum XrSwapchainUsageFlags : ulong { XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT = 1, XR_SWAPCHAIN_USAGE_TRANSFER_DST_BIT = 16, XR_SWAPCHAIN_USAGE_SAMPLED_BIT = 32 }
     [Flags] public enum XrViewStateFlags : ulong { XR_VIEW_STATE_ORIENTATION_VALID_BIT = 1, XR_VIEW_STATE_POSITION_VALID_BIT = 2 }
-    [Flags] public enum XrCompositionLayerFlags : ulong { None = 0 }
+    [Flags] public enum XrCompositionLayerFlags : ulong { None = 0, XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT = 1, XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT = 2, XR_COMPOSITION_LAYER_UNPREMULTIPLIED_ALPHA_BIT = 4 }
+    public enum XrActionType
+    {
+        XR_ACTION_TYPE_BOOLEAN_INPUT = 1,
+        XR_ACTION_TYPE_FLOAT_INPUT = 2,
+        XR_ACTION_TYPE_VECTOR2F_INPUT = 3,
+        XR_ACTION_TYPE_POSE_INPUT = 4,
+        XR_ACTION_TYPE_VIBRATION_OUTPUT = 100,
+    }
+    [Flags] public enum XrSpaceLocationFlags : ulong
+    {
+        None = 0,
+        XR_SPACE_LOCATION_ORIENTATION_VALID_BIT = 0x1,
+        XR_SPACE_LOCATION_POSITION_VALID_BIT = 0x2,
+        XR_SPACE_LOCATION_ORIENTATION_TRACKED_BIT = 0x4,
+        XR_SPACE_LOCATION_POSITION_TRACKED_BIT = 0x8,
+    }
 
     #endregion
 
@@ -127,7 +162,15 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
         public const int XR_MAX_SYSTEM_NAME_SIZE = 256;
         public const int XR_MAX_EXTENSION_NAME_SIZE = 128;
         public static ulong XR_API_VERSION_1_1 = (1UL << 48) | (1UL << 32);
+        // 1.0 フォールバック用（VDXR 等の 1.0 専用ランタイムは 1.1 要求を XR_ERROR_API_VERSION_UNSUPPORTED で拒否する）
+        public static ulong XR_API_VERSION_1_0 = (1UL << 48);
         public const string XR_KHR_D3D11_ENABLE_EXTENSION_NAME = "XR_KHR_D3D11_enable";
+        public const string XR_KHR_D3D12_ENABLE_EXTENSION_NAME = "XR_KHR_D3D12_enable";
+        public const int XR_MAX_ACTION_SET_NAME_SIZE = 64;
+        public const int XR_MAX_LOCALIZED_ACTION_SET_NAME_SIZE = 128;
+        public const int XR_MAX_ACTION_NAME_SIZE = 64;
+        public const int XR_MAX_LOCALIZED_ACTION_NAME_SIZE = 128;
+        public const ulong XR_NULL_PATH = 0;
     }
     public static class XrBool32 { public const uint XR_FALSE = 0; public const uint XR_TRUE = 1; }
     #endregion
@@ -140,6 +183,7 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrGetSystem(ulong instance, in XrSystemGetInfo getInfo, out ulong systemId);
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrGetSystemProperties(ulong instance, ulong systemId, ref XrSystemProperties properties);
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrGetD3D11GraphicsRequirementsKHR(ulong instance, ulong systemId, out XrGraphicsRequirementsD3D11KHR graphicsRequirements);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrGetD3D12GraphicsRequirementsKHR(ulong instance, ulong systemId, out XrGraphicsRequirementsD3D11KHR graphicsRequirements); // struct は D3D11 版と同レイアウトのため流用（type は D3D12 値を呼び出し側が設定）
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrCreateSession(ulong instance, in XrSessionCreateInfo createInfo, out ulong session);
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrDestroySession(ulong session);
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrWaitFrame(ulong session, in XrFrameWaitInfo frameWaitInfo, out XrFrameState frameState);
@@ -160,6 +204,25 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrWaitSwapchainImage(ulong swapchain, in XrSwapchainImageWaitInfo waitInfo);
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrReleaseSwapchainImage(ulong swapchain, in XrSwapchainImageReleaseInfo releaseInfo);
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrEndSession(ulong session);
+    // --- Input (action system) ---
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrStringToPath(ulong instance, [MarshalAs(UnmanagedType.LPStr)] string pathString, out ulong path);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrCreateActionSet(ulong instance, in XrActionSetCreateInfo createInfo, out ulong actionSet);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrDestroyActionSet(ulong actionSet);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrCreateAction(ulong actionSet, in XrActionCreateInfo createInfo, out ulong action);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrDestroyAction(ulong action);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrSuggestInteractionProfileBindings(ulong instance, in XrInteractionProfileSuggestedBinding suggestedBindings);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrAttachSessionActionSets(ulong session, in XrSessionActionSetsAttachInfo attachInfo);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrSyncActions(ulong session, in XrActionsSyncInfo syncInfo);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrGetActionStateBoolean(ulong session, in XrActionStateGetInfo getInfo, ref XrActionStateBoolean state);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrGetActionStateFloat(ulong session, in XrActionStateGetInfo getInfo, ref XrActionStateFloat state);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrGetActionStateVector2f(ulong session, in XrActionStateGetInfo getInfo, ref XrActionStateVector2f state);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrGetActionStatePose(ulong session, in XrActionStateGetInfo getInfo, ref XrActionStatePose state);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrCreateActionSpace(ulong session, in XrActionSpaceCreateInfo createInfo, out ulong space);
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrLocateSpace(ulong space, ulong baseSpace, long time, ref XrSpaceLocation location);
+    // 公式シグネチャの第3引数は const XrHapticBaseHeader*。XrHapticVibration は base header の派生
+    // （先頭が type/next で ABI 互換）なので in XrHapticVibration で直接渡せる。これは type が
+    // XR_TYPE_HAPTIC_VIBRATION(=13) に正しくセットされている前提で成立する（type 誤りは無言で弾かれる）。
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)] public delegate XrResult PFN_xrApplyHapticFeedback(ulong session, in XrHapticActionInfo hapticActionInfo, in XrHapticVibration hapticFeedback);
     #endregion
 
     #region --- Native Loader ---
@@ -224,6 +287,7 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
         public static PFN_xrDestroyInstance xrDestroyInstance;
         public static PFN_xrGetSystem xrGetSystem;
         public static PFN_xrGetD3D11GraphicsRequirementsKHR xrGetD3D11GraphicsRequirementsKHR;
+        public static PFN_xrGetD3D12GraphicsRequirementsKHR xrGetD3D12GraphicsRequirementsKHR;
         public static PFN_xrCreateSession xrCreateSession;
         public static PFN_xrDestroySession xrDestroySession;
         public static PFN_xrWaitFrame xrWaitFrame;
@@ -244,6 +308,22 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
         public static PFN_xrWaitSwapchainImage xrWaitSwapchainImage;
         public static PFN_xrReleaseSwapchainImage xrReleaseSwapchainImage;
         public static PFN_xrEndSession xrEndSession;
+        // --- Input (action system) ---
+        public static PFN_xrStringToPath xrStringToPath;
+        public static PFN_xrCreateActionSet xrCreateActionSet;
+        public static PFN_xrDestroyActionSet xrDestroyActionSet;
+        public static PFN_xrCreateAction xrCreateAction;
+        public static PFN_xrDestroyAction xrDestroyAction;
+        public static PFN_xrSuggestInteractionProfileBindings xrSuggestInteractionProfileBindings;
+        public static PFN_xrAttachSessionActionSets xrAttachSessionActionSets;
+        public static PFN_xrSyncActions xrSyncActions;
+        public static PFN_xrGetActionStateBoolean xrGetActionStateBoolean;
+        public static PFN_xrGetActionStateFloat xrGetActionStateFloat;
+        public static PFN_xrGetActionStateVector2f xrGetActionStateVector2f;
+        public static PFN_xrGetActionStatePose xrGetActionStatePose;
+        public static PFN_xrCreateActionSpace xrCreateActionSpace;
+        public static PFN_xrLocateSpace xrLocateSpace;
+        public static PFN_xrApplyHapticFeedback xrApplyHapticFeedback;
 
         public static bool InitializeCoreFunctions(PFN_xrGetInstanceProcAddr getInstanceProcAddrEntry)
         {
@@ -259,7 +339,13 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
             {
                 xrDestroyInstance = GetXrFunction<PFN_xrDestroyInstance>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
                 xrGetSystem = GetXrFunction<PFN_xrGetSystem>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
-                xrGetD3D11GraphicsRequirementsKHR = GetXrFunction<PFN_xrGetD3D11GraphicsRequirementsKHR>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                // graphics requirements 関数は instance 生成時に有効化した拡張（D3D11/D3D12 の片方のみ）に
+                // 対応する側しか取得できない（未有効側は XR_ERROR_FUNCTION_UNSUPPORTED）。
+                // 両方 try/catch で null 許容し、各 backend の init 時に null チェックで弾く。
+                try { xrGetD3D11GraphicsRequirementsKHR = GetXrFunction<PFN_xrGetD3D11GraphicsRequirementsKHR>(instanceHandle, xrGetInstanceProcAddr_func_ptr); }
+                catch { xrGetD3D11GraphicsRequirementsKHR = null; }
+                try { xrGetD3D12GraphicsRequirementsKHR = GetXrFunction<PFN_xrGetD3D12GraphicsRequirementsKHR>(instanceHandle, xrGetInstanceProcAddr_func_ptr); }
+                catch { xrGetD3D12GraphicsRequirementsKHR = null; }
                 xrCreateSession = GetXrFunction<PFN_xrCreateSession>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
                 xrDestroySession = GetXrFunction<PFN_xrDestroySession>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
                 xrWaitFrame = GetXrFunction<PFN_xrWaitFrame>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
@@ -280,6 +366,22 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
                 xrWaitSwapchainImage = GetXrFunction<PFN_xrWaitSwapchainImage>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
                 xrReleaseSwapchainImage = GetXrFunction<PFN_xrReleaseSwapchainImage>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
                 xrEndSession = GetXrFunction<PFN_xrEndSession>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                // --- Input (action system) ---
+                xrStringToPath = GetXrFunction<PFN_xrStringToPath>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrCreateActionSet = GetXrFunction<PFN_xrCreateActionSet>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrDestroyActionSet = GetXrFunction<PFN_xrDestroyActionSet>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrCreateAction = GetXrFunction<PFN_xrCreateAction>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrDestroyAction = GetXrFunction<PFN_xrDestroyAction>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrSuggestInteractionProfileBindings = GetXrFunction<PFN_xrSuggestInteractionProfileBindings>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrAttachSessionActionSets = GetXrFunction<PFN_xrAttachSessionActionSets>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrSyncActions = GetXrFunction<PFN_xrSyncActions>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrGetActionStateBoolean = GetXrFunction<PFN_xrGetActionStateBoolean>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrGetActionStateFloat = GetXrFunction<PFN_xrGetActionStateFloat>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrGetActionStateVector2f = GetXrFunction<PFN_xrGetActionStateVector2f>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrGetActionStatePose = GetXrFunction<PFN_xrGetActionStatePose>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrCreateActionSpace = GetXrFunction<PFN_xrCreateActionSpace>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrLocateSpace = GetXrFunction<PFN_xrLocateSpace>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
+                xrApplyHapticFeedback = GetXrFunction<PFN_xrApplyHapticFeedback>(instanceHandle, xrGetInstanceProcAddr_func_ptr);
                 return true;
             }
             catch (Exception ex)
@@ -360,6 +462,7 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
     [StructLayout(LayoutKind.Sequential)] public struct LUID { public uint LowPart; public int HighPart; }
     [StructLayout(LayoutKind.Sequential)] public struct XrGraphicsRequirementsD3D11KHR { public XrStructureType type; public IntPtr next; public LUID adapterLuid; public D3D_FEATURE_LEVEL minFeatureLevel; }
     [StructLayout(LayoutKind.Sequential)] public struct XrGraphicsBindingD3D11KHR { public XrStructureType type; public IntPtr next; public IntPtr device; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrGraphicsBindingD3D12KHR { public XrStructureType type; public IntPtr next; public IntPtr device; public IntPtr queue; }
     [StructLayout(LayoutKind.Sequential)] public struct XrSessionCreateInfo { public XrStructureType type; public IntPtr next; public ulong createFlags; public ulong systemId; }
     [StructLayout(LayoutKind.Sequential)] public struct XrFrameWaitInfo { public XrStructureType type; public IntPtr next; }
     [StructLayout(LayoutKind.Sequential)] public struct XrFrameBeginInfo { public XrStructureType type; public IntPtr next; }
@@ -379,11 +482,16 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
     [StructLayout(LayoutKind.Sequential)] public struct XrView { public XrStructureType type; public IntPtr next; public XrPosef pose; public XrFovf fov; }
     [StructLayout(LayoutKind.Sequential)] public struct XrReferenceSpaceCreateInfo { public XrStructureType type; public IntPtr next; public XrReferenceSpaceType referenceSpaceType; public XrPosef poseInReferenceSpace; }
     [StructLayout(LayoutKind.Sequential)] public struct XrOffset2Di { public int x; public int y; }
+    public enum XrEyeVisibility { XR_EYE_VISIBILITY_BOTH = 0, XR_EYE_VISIBILITY_LEFT = 1, XR_EYE_VISIBILITY_RIGHT = 2 }
     [StructLayout(LayoutKind.Sequential)] public struct XrExtent2Di { public int width; public int height; }
     [StructLayout(LayoutKind.Sequential)] public struct XrRect2Di { public XrOffset2Di offset; public XrExtent2Di extent; }
     [StructLayout(LayoutKind.Sequential)] public struct XrSwapchainSubImage { public ulong swapchain; public XrRect2Di imageRect; public uint imageArrayIndex; }
     [StructLayout(LayoutKind.Sequential)] public struct XrCompositionLayerProjectionView { public XrStructureType type; public IntPtr next; public XrPosef pose; public XrFovf fov; public XrSwapchainSubImage subImage; }
     [StructLayout(LayoutKind.Sequential)] public struct XrCompositionLayerProjection { public XrStructureType type; public IntPtr next; public XrCompositionLayerFlags layerFlags; public ulong space; public uint viewCount; public IntPtr views; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrExtent2Df { public float width; public float height; }
+    // OpenXR ABI: eyeVisibility(int 4byte) の後に subImage(先頭 ulong) が来るため自然境界で 4byte パディングが入る。
+    // C 側も同じ自然アラインメントなので LayoutKind.Sequential 既定 pack で native と一致する。
+    [StructLayout(LayoutKind.Sequential)] public struct XrCompositionLayerQuad { public XrStructureType type; public IntPtr next; public XrCompositionLayerFlags layerFlags; public ulong space; public XrEyeVisibility eyeVisibility; public XrSwapchainSubImage subImage; public XrPosef pose; public XrExtent2Df size; }
     [StructLayout(LayoutKind.Sequential)] public struct XrFrameEndInfo { public XrStructureType type; public IntPtr next; public long displayTime; public XrEnvironmentBlendMode environmentBlendMode; public uint layerCount; public IntPtr layers; }
     [StructLayout(LayoutKind.Sequential)] public struct XrSwapchainImageAcquireInfo { public XrStructureType type; public IntPtr next; }
     [StructLayout(LayoutKind.Sequential)] public struct XrSwapchainImageWaitInfo { public XrStructureType type; public IntPtr next; public long timeout; }
@@ -396,6 +504,31 @@ namespace UnityVRMod.Features.VRVisualization.OpenXR
         public byte[] varying;
         public static int GetSize() { return Marshal.SizeOf(typeof(XrEventDataBuffer)); }
     }
+
+    // --- Input (action system) structs ---
+    [StructLayout(LayoutKind.Sequential)] public struct XrVector2f { public float x; public float y; }
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)] public struct XrActionSetCreateInfo { public XrStructureType type; public IntPtr next; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = OpenXRConstants.XR_MAX_ACTION_SET_NAME_SIZE)] public string actionSetName; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = OpenXRConstants.XR_MAX_LOCALIZED_ACTION_SET_NAME_SIZE)] public string localizedActionSetName; public uint priority; }
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)] public struct XrActionCreateInfo { public XrStructureType type; public IntPtr next; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = OpenXRConstants.XR_MAX_ACTION_NAME_SIZE)] public string actionName; public XrActionType actionType; public uint countSubactionPaths; public IntPtr subactionPaths; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = OpenXRConstants.XR_MAX_LOCALIZED_ACTION_NAME_SIZE)] public string localizedActionName; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrActionSuggestedBinding { public ulong action; public ulong binding; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrInteractionProfileSuggestedBinding { public XrStructureType type; public IntPtr next; public ulong interactionProfile; public uint countSuggestedBindings; public IntPtr suggestedBindings; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrSessionActionSetsAttachInfo { public XrStructureType type; public IntPtr next; public uint countActionSets; public IntPtr actionSets; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrActiveActionSet { public ulong actionSet; public ulong subactionPath; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrActionsSyncInfo { public XrStructureType type; public IntPtr next; public uint countActiveActionSets; public IntPtr activeActionSets; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrActionStateGetInfo { public XrStructureType type; public IntPtr next; public ulong action; public ulong subactionPath; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrActionStateBoolean { public XrStructureType type; public IntPtr next; public uint currentState; public uint changedSinceLastSync; public long lastChangeTime; public uint isActive; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrActionStateFloat { public XrStructureType type; public IntPtr next; public float currentState; public uint changedSinceLastSync; public long lastChangeTime; public uint isActive; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrActionStateVector2f { public XrStructureType type; public IntPtr next; public XrVector2f currentState; public uint changedSinceLastSync; public long lastChangeTime; public uint isActive; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrActionStatePose { public XrStructureType type; public IntPtr next; public uint isActive; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrActionSpaceCreateInfo { public XrStructureType type; public IntPtr next; public ulong action; public ulong subactionPath; public XrPosef poseInActionSpace; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrSpaceLocation { public XrStructureType type; public IntPtr next; public XrSpaceLocationFlags locationFlags; public XrPosef pose; }
+    [Flags] public enum XrSpaceVelocityFlags : ulong
+    {
+        XR_SPACE_VELOCITY_LINEAR_VALID_BIT = 0x00000001,
+        XR_SPACE_VELOCITY_ANGULAR_VALID_BIT = 0x00000002,
+    }
+    [StructLayout(LayoutKind.Sequential)] public struct XrSpaceVelocity { public XrStructureType type; public IntPtr next; public XrSpaceVelocityFlags velocityFlags; public XrVector3f linearVelocity; public XrVector3f angularVelocity; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrHapticActionInfo { public XrStructureType type; public IntPtr next; public ulong action; public ulong subactionPath; }
+    [StructLayout(LayoutKind.Sequential)] public struct XrHapticVibration { public XrStructureType type; public IntPtr next; public long duration; public float frequency; public float amplitude; }
 
     public static class MarshallStringUtils
     {

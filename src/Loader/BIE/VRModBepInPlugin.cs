@@ -11,7 +11,7 @@ using UnityVRMod.Loader;
 #if CPP
 using BepInEx.Unity.IL2CPP;
 #endif
-#if MONO
+#if MONO && !BIE5
 using BepInEx.Unity.Mono;
 #endif
 
@@ -45,6 +45,7 @@ namespace UnityVRMod
         public ConfigHandler ConfigHandler => _configHandler;
         private BepInExConfigHandler _configHandler;
 
+        public Action<object> LogDebug => LogSource.LogDebug;
         public Action<object> LogMessage => LogSource.LogMessage;
         public Action<object> LogWarning => LogSource.LogWarning;
         public Action<object> LogError => LogSource.LogError;

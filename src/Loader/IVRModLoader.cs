@@ -6,6 +6,7 @@ namespace UnityVRMod.Loader
     {
         string InteropAssembliesPath { get; }
         ConfigHandler ConfigHandler { get; }
+        Action<object> LogDebug { get; }
         Action<object> LogMessage { get; }
         Action<object> LogWarning { get; }
         Action<object> LogError { get; }
